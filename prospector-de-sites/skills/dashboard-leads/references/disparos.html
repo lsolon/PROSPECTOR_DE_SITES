@@ -80,6 +80,9 @@ main{flex:1;min-width:0;height:100%;overflow-y:auto;padding:22px 28px 40px}
 .pill.fr{color:#fff;background:var(--fc)}
 .pill.venc{background:var(--warn-soft);color:var(--warn)}
 .gancho{font-size:12.5px;color:var(--muted);font-style:italic;border-left:2px solid var(--line);padding-left:8px;line-height:1.45;margin:8px 0}
+.apres{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.apres summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent)}
+.apres textarea{margin-top:8px}
 .hist{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--muted)}
 .hist li{padding:3px 0 3px 14px;position:relative;line-height:1.4}
 .hist li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--line)}
@@ -169,6 +172,16 @@ const FILAS = [
  {id:'encerrados', nome:'Encerrados', desc:'recusa ou sem resposta'}
 ];
 let HOJE = new Date().toISOString().slice(0,10);
+/* Segunda mensagem opcional (depois do primeiro contato), por frente. Edite os textos e links aqui. */
+const APRESENTACAO = {
+ ingressos: 'Para vocês verem com calma, preparei uma apresentação rápida do sistema, com um vídeo de 1 minuto mostrando a compra:\nhttps://approutinetech.com.br/clientes/studio-arte/apresentacao/\n\nSe fizer sentido, marcamos uma conversa rápida para eu entender o espetáculo de vocês.',
+ decoracao: 'Para você ver com calma, este é o exemplo de site que montei para decoração de festas:\nhttps://approutinetech.com.br/modelos/decoracao-festas/\n\nSe fizer sentido, preparo um com as fotos e os temas de vocês.'
+};
+function apresPadrao(d){
+ if(APRESENTACAO[d.frente]) return APRESENTACAO[d.frente];
+ if(d.lead_urlNova) return 'Para você ver com calma, esta é a prévia que preparei para vocês:\n' + d.lead_urlNova + '\n\nSe fizer sentido, conversamos sobre os ajustes.';
+ return '';
+}
 let itens = [], filaAtual = 'enviar', frenteAtual = 'todas', canalAtual = 'todos', termo = '', ultimo = null, toastTimer;
 const timers = {};
 
@@ -189,6 +202,7 @@ async function carregar(importar){
  try{
   const j = await api('/api/disparos' + (importar ? '?importar=1' : ''));
   HOJE = j.hoje || HOJE; itens = j.disparos || [];
+  itens.forEach(d => { if(!d.apresentacaoMsg) d.apresentacaoMsg = apresPadrao(d); });
   document.getElementById('hoje').textContent = br(HOJE) + '/' + HOJE.slice(0,4);
   const av = document.getElementById('avisos');
   const linhas = [];
@@ -268,6 +282,7 @@ function historico(d){
  if(d.enviadoEm) it.push(`<li class="feito">Enviada por ${CANAIS[d.canal]||d.canal} em ${br(d.enviadoEm)}</li>`);
  if(d.followupEnviadoEm) it.push(`<li class="feito">Follow-up enviado em ${br(d.followupEnviadoEm)}</li>`);
  else if(d.enviadoEm && d.followupEm && !d.respondeuEm && !d.encerradoEm) it.push(`<li class="prox">Follow-up previsto para ${br(d.followupEm)}</li>`);
+ if(d.apresentacaoEm) it.push(`<li class="feito">Apresentação enviada em ${br(d.apresentacaoEm)}</li>`);
  if(d.respondeuEm) it.push(`<li class="feito">Respondeu em ${br(d.respondeuEm)}</li>`);
  if(d.encerradoEm) it.push(`<li>Encerrado em ${br(d.encerradoEm)}${d.motivo?': '+esc(d.motivo):''}</li>`);
  return `<ul class="hist">${it.join('')}</ul>`;
@@ -301,7 +316,13 @@ function card(d){
  } else if(fila==='responderam'){
   corpo = `<label>Última mensagem enviada</label><div class="enviada">${esc(d.mensagem)}</div>`;
   acoes = `${btnAbrir('mensagem')}<button class="btn quiet" data-acao="descartar" data-id="${d.id}" data-motivo="Recusou.">Recusou</button>`;
- } else {
+ }
+ if(['followup','aguardando','responderam'].includes(fila) && d.apresentacaoMsg){
+  acoes += `<details class="apres"${d.apresentacaoEm?'':''}><summary>${d.apresentacaoEm?'Apresentação enviada em '+br(d.apresentacaoEm)+' · enviar de novo':'Enviar apresentação (opcional)'}</summary>
+   <textarea data-campo="apresentacaoMsg" data-id="${d.id}" aria-label="Mensagem da apresentação">${esc(d.apresentacaoMsg)}</textarea>
+   <div class="acoes">${btnAbrir('apresentacaoMsg')}${btnCopiar('apresentacaoMsg')}<button class="btn pri" data-acao="apresentacao" data-id="${d.id}">Marcar apresentação enviada</button></div></details>`;
+ }
+ if(fila==='encerrados'){
   corpo = `<label>Última mensagem</label><div class="enviada">${esc(d.mensagem)}</div>`;
   acoes = d.encerradoEm ? `<button class="btn" data-acao="reabrir" data-id="${d.id}">Reabrir</button>` : '';
  }
@@ -348,7 +369,8 @@ const MSG = {
  respondeu:'Foi para "Responderam".',
  encerrar:'Encerrado sem resposta.',
  descartar:'Encerrado.',
- reabrir:'Reaberto.'
+ reabrir:'Reaberto.',
+ apresentacao:'Apresentação registrada.'
 };
 
 async function executar(id, nome, corpo={}){
@@ -395,6 +417,7 @@ document.addEventListener('click', async e=>{
   if(motivo===null) return;
   return executar(id, a, {motivo: motivo || padrao || 'Descartado.'});
  }
+ if(a==='apresentacao') return executar(id, a, {texto: d.apresentacaoMsg});
  executar(id, a);
 });
 

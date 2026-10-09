@@ -16,10 +16,10 @@ import json, os, re, shutil, sqlite3, datetime
 
 ORDEM = {'novo': 0, 'redesenhado': 1, 'publicado': 2, 'proposta': 3, 'respondeu': 4, 'fechado': 5}
 CANAIS = {'whatsapp', 'instagram', 'email', 'messenger'}
-CAMPOS_EDITAVEIS = {'mensagem', 'followupMsg', 'assunto', 'contato', 'canal', 'frente', 'followupEm'}
+CAMPOS_EDITAVEIS = {'mensagem', 'followupMsg', 'apresentacaoMsg', 'assunto', 'contato', 'canal', 'frente', 'followupEm'}
 CAMPOS_DISPARO = ['slug', 'frente', 'canal', 'contato', 'assunto', 'mensagem', 'followupMsg', 'script',
                   'origem', 'criadoEm', 'enviadoEm', 'followupEm', 'followupEnviadoEm',
-                  'respondeuEm', 'encerradoEm', 'motivo']
+                  'respondeuEm', 'encerradoEm', 'motivo', 'apresentacaoMsg', 'apresentacaoEm']
 DIAS_FOLLOWUP = 4
 AVISOS = []          # avisos da última importação (o painel mostra)
 
@@ -43,8 +43,12 @@ def garantir_tabela(c):
         respondeuEm TEXT, encerradoEm TEXT, motivo TEXT,
         atualizado TEXT DEFAULT (datetime('now','localtime')))''')
     c.execute('CREATE INDEX IF NOT EXISTS idx_disparos_slug ON disparos(slug)')
-    if 'statusAntes' not in [r[1] for r in c.execute('PRAGMA table_info(disparos)')]:
-        c.execute('ALTER TABLE disparos ADD COLUMN statusAntes TEXT')   # status do lead antes de encerrar (Reabrir)
+    cols = [r[1] for r in c.execute('PRAGMA table_info(disparos)')]
+    for col in ('statusAntes',        # status do lead antes de encerrar (Reabrir)
+                'apresentacaoMsg',    # segunda mensagem opcional, com a apresentação/modelo
+                'apresentacaoEm'):
+        if col not in cols:
+            c.execute('ALTER TABLE disparos ADD COLUMN %s TEXT' % col)
 
 
 def colunas_leads(c):
@@ -66,7 +70,7 @@ def listar(c):
     c.row_factory = sqlite3.Row
     cols = set(colunas_leads(c))
     extra = [k for k in ('nome', 'cidade', 'nicho', 'status', 'motivo', 'obs', 'whatsapp', 'email',
-                         'siteAntigo', 'dataProposta', 'nota', 'avaliacoes') if k in cols]
+                         'siteAntigo', 'urlNova', 'dataProposta', 'nota', 'avaliacoes') if k in cols]
     sel = ', '.join('l.%s AS lead_%s' % (k, k) for k in extra)
     sql = '''SELECT d.*%s FROM disparos d LEFT JOIN leads l ON l.slug = d.slug
              WHERE d.id = (SELECT MAX(id) FROM disparos x WHERE x.slug = d.slug)
@@ -133,6 +137,11 @@ def acao(c, id_, nome, corpo=None):
                 upd['followupEm'][8:] + '/' + upd['followupEm'][5:7]))
     elif nome == 'fupEnviado':
         upd = {'followupEnviadoEm': h}
+    elif nome == 'apresentacao':       # segunda mensagem opcional, depois do primeiro contato
+        upd = {'apresentacaoEm': h}
+        if corpo.get('texto'):
+            upd['apresentacaoMsg'] = corpo['texto']
+        _anotar(c, d['slug'], 'apresentação enviada %s' % (h[8:] + '/' + h[5:7]))
     elif nome == 'respondeu':
         upd = {'respondeuEm': h}
         _avancar(c, d['slug'], 'respondeu')
