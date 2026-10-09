@@ -1,4 +1,4 @@
-# Prospector de Sites — Marketplace de plugins do Helio Arreche
+# Prospector de Sites — Marketplace de plugins 
 
 Plugin para Claude (Cowork / Claude Code) que roda o ciclo completo de prospecção e venda de sites:
 
@@ -35,4 +35,3 @@ A senha do cPanel nunca é digitada no chat: você preenche o campo `"senha"` no
 
 ---
 
-Criado por [Helio Arreche](https://github.com/ArrecheNeto) · Aprenda a usar no meu canal do YouTube
