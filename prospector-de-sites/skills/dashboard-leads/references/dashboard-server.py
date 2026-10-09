@@ -8,6 +8,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 PASTA = os.path.dirname(os.path.abspath(__file__))
 os.chdir(PASTA)
+sys.path.insert(0, PASTA)
+import disparos_modulo as dm   # página Disparos: rotas /api/disparos*
 DB = os.path.join(PASTA, 'prospector.db')
 CONFIG = os.path.join(PASTA, 'prospector-config.json')
 
@@ -60,6 +62,7 @@ class App(SimpleHTTPRequestHandler):
         n = int(self.headers.get('Content-Length', 0))
         return json.loads(self.rfile.read(n).decode('utf-8')) if n else {}
     def do_GET(self):
+        if dm.tratar(self, 'GET'): return
         if self.path.split('?')[0] == '/api/config':
             cfg = ler_config()
             hg = dict(cfg.get('hostgator', {}))
@@ -74,6 +77,7 @@ class App(SimpleHTTPRequestHandler):
             self.path = '/dashboard.html'
         return SimpleHTTPRequestHandler.do_GET(self)
     def do_POST(self):
+        if dm.tratar(self, 'POST'): return
         if self.path.split('?')[0] == '/api/leads':
             l = self._corpo(); c = conexao()
             c.execute('INSERT OR REPLACE INTO leads (%s) VALUES (%s)' % (','.join(CAMPOS), ','.join('?'*len(CAMPOS))),
@@ -81,6 +85,7 @@ class App(SimpleHTTPRequestHandler):
             c.commit(); c.close(); return self._json(200, {'ok': True})
         return self._json(404, {'erro': 'rota'})
     def do_PUT(self):
+        if dm.tratar(self, 'PUT'): return
         if self.path.split('?')[0] == '/api/config':
             cfg = ler_config(); corpo = self._corpo()
             if 'contratante' in corpo or 'hostgator' in corpo:
@@ -124,6 +129,9 @@ if __name__ == '__main__':
     novo = not os.path.exists(DB)
     conexao().close()
     if novo: importar_snapshot()
+    _c = sqlite3.connect(DB); dm.garantir_tabela(_c)
+    print('Importação da entrada/: %s' % dm.importar_entrada(_c, os.path.join(PASTA, 'entrada'))); _c.close()
+    for a in dm.AVISOS: print('  aviso: ' + a)
     print('Prospector rodando em http://localhost:%d  (Ctrl+C para parar)' % PORTA)
     try: webbrowser.open('http://localhost:%d' % PORTA)
     except Exception: pass

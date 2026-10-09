@@ -14,7 +14,10 @@ Envie propostas para os leads com página publicada, seguindo a skill `proposta-
 5. Envio conforme o modo do config:
    - **rascunho** (padrão): crie o rascunho pelo conector do Gmail e informe que está pronto para revisão na caixa de rascunhos.
    - **enviar direto**: se o conector do Gmail não oferecer envio direto, use o Claude in Chrome no Gmail web para enviar, ou crie o rascunho e avise o usuário.
-6. Atualize `leads.md` e o banco do dashboard: status `proposta` + data de envio.
+6. Registre a proposta na página **Disparos** do painel (skill `dashboard-leads`, seção "Página Disparos"): um disparo por cliente com `frente` = `sites`, `canal` = `email`, `contato` = e-mail do lead, `assunto`, `mensagem` = texto do e-mail, `script` = `proposta-email` e `origem` = `Claude Code /proposta AAAA-MM-DD` (ou o nome do chat). Com a pasta conectada, grave com `disparos_modulo.gravar_disparo`; sem pasta, salve o JSON em `entrada/` pelo conector do Google Drive. Não gere página `disparos-*.html`.
+   - **rascunho:** grave o disparo sem `enviadoEm` (fica em "A enviar"). O usuário envia o rascunho pelo Gmail (não pelo botão "Abrir e-mail" da página, para não mandar duas vezes) e clica em "Marcar como enviada": isso põe o lead em `proposta` com `dataProposta`.
+   - **enviar direto:** grave o disparo com `enviadoEm` = hoje e `followupEm` = hoje + 4 dias, e mude o lead para `proposta` + `dataProposta` como antes.
+   Atualize também o `leads.md`.
 
 ## Saída
 

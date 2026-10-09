@@ -216,11 +216,11 @@ function salvarEdit(){if(!editSlug)return;var ch={};
  var mn=document.getElementById('m-manutencao').value;ch.manutencao=mn===''?null:parseFloat(mn);
  ch.pago=parseInt(document.getElementById('m-pago').value);ch.contratoStatus=document.getElementById('m-contratoStatus').value;
  var slug=editSlug;fecharEdit();salvarOv(slug,ch)}
-function setView(v){view=v;render()}
+function setView(v){if(v==='disparos'){location.href='/disparos.html';return}view=v;render()}
 function nav(){
  var fu=fil().filter(function(l){return l.status==='proposta'&&dias(l.dataProposta)>=4});
  var fechadosN=fil().filter(function(l){return l.status==='fechado'}).length;
- var itens=[['geral','Visão geral',null],['pipeline','Pipeline',ativos().length],['clientes','Clientes',fil().length],['sites','Sites',fil().filter(function(l){return['redesenhado','publicado','proposta','respondeu','fechado'].indexOf(l.status)>=0}).length],['comparador','Comparador',fil().filter(function(l){return l.slug&&['redesenhado','publicado','proposta','respondeu','fechado'].indexOf(l.status)>=0}).length],['followup','Follow-ups',fu.length],['contratos','Contratos',fechadosN],['financeiro','Financeiro',null],['config','Configurações',null]];
+ var itens=[['geral','Visão geral',null],['pipeline','Pipeline',ativos().length],['clientes','Clientes',fil().length],['sites','Sites',fil().filter(function(l){return['redesenhado','publicado','proposta','respondeu','fechado'].indexOf(l.status)>=0}).length],['comparador','Comparador',fil().filter(function(l){return l.slug&&['redesenhado','publicado','proposta','respondeu','fechado'].indexOf(l.status)>=0}).length],['followup','Follow-ups',fu.length],['disparos','Disparos',null],['contratos','Contratos',fechadosN],['financeiro','Financeiro',null],['config','Configurações',null]];
  document.getElementById('nav').innerHTML=itens.map(function(i){return '<button class="'+(view===i[0]?'on':'')+'" onclick="setView(\''+i[0]+'\')">'+i[1]+(i[2]!==null?'<span class="qt">'+i[2]+'</span>':'')+'</button>'}).join('');
  document.getElementById('titulo').textContent=itens.filter(function(i){return i[0]===view})[0][1];
 }

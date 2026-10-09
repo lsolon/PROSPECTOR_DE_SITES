@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prospector — Disparos</title>
+<style>
+:root{
+ --paper:#F0EEE5;--surface:#FAF9F5;--white:#FFFFFF;--ink:#1F1E1D;--muted:#7A766E;--line:#E3DFD5;
+ --side:#1F1E1D;--side-ink:#CFC9BE;--side-line:#3A3835;
+ --accent:#D97757;--accent-2:#B5532F;--accent-soft:#F4E5DE;
+ --ok:#4E8757;--ok-soft:#E7EFE8;--warn:#A86E14;--warn-soft:#F6ECD9;--danger:#A8483B;--danger-soft:#F5E1DD;
+ --f-sites:#5E9DA8;--f-ing:#9C7BB8;--f-dec:#C98A2D;
+ --serif:Georgia,'Times New Roman',serif;--sans:-apple-system,'Segoe UI',Roboto,Inter,Arial,sans-serif;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --paper:#1B1A18;--surface:#232220;--white:#2A2926;--ink:#ECE8E0;--muted:#A39E94;--line:#3A3834;
+ --side:#121110;--side-ink:#BDB7AC;--side-line:#2C2A27;
+ --accent-soft:#3A2A23;--ok:#7DB486;--ok-soft:#24302A;--warn:#D9A24A;--warn-soft:#352C1D;--danger:#D97A6C;--danger-soft:#3A2522;--accent-2:#E89474;
+}}
+:root[data-theme="dark"]{
+ --paper:#1B1A18;--surface:#232220;--white:#2A2926;--ink:#ECE8E0;--muted:#A39E94;--line:#3A3834;
+ --side:#121110;--side-ink:#BDB7AC;--side-line:#2C2A27;
+ --accent-soft:#3A2A23;--ok:#7DB486;--ok-soft:#24302A;--warn:#D9A24A;--warn-soft:#352C1D;--danger:#D97A6C;--danger-soft:#3A2522;--accent-2:#E89474;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;display:flex}
+button,textarea,select,input{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* lateral igual ao painel */
+aside{width:232px;flex:0 0 232px;background:var(--side);color:#EDEAE3;padding:22px 14px;display:flex;flex-direction:column;height:100%;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px;padding:0 10px 20px;border-bottom:1px solid var(--side-line);margin-bottom:16px}
+.logo .burst{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
+.logo b{font-family:var(--serif);font-size:17px;font-weight:600}
+.logo span{display:block;font-size:11px;color:#A8A399;margin-top:1px}
+nav{display:flex;flex-direction:column;gap:2px}
+nav button{display:flex;align-items:center;justify-content:space-between;background:none;border:0;color:var(--side-ink);font-size:13.5px;font-weight:600;padding:10px 12px;border-radius:9px;text-align:left;cursor:pointer}
+nav button:disabled{opacity:.45;cursor:default}
+nav button.on{background:var(--accent);color:#fff}
+nav button .qt{font-size:11px;background:#00000030;padding:1px 8px;border-radius:10px}
+.side-foot{margin-top:auto;font-size:11.5px;color:#8B867C;padding:12px 10px;line-height:1.55}
+
+main{flex:1;min-width:0;height:100%;overflow-y:auto;padding:22px 28px 40px}
+.aviso{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.45;margin-bottom:18px}
+.aviso b{font-weight:700}
+.topbar{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.topbar h1{font-family:var(--serif);font-size:28px;font-weight:600;margin:0}
+.topbar .upd{color:var(--muted);font-size:12.5px;margin-top:4px}
+.busca{margin-left:auto;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:9px 14px;width:260px;max-width:100%}
+
+/* filas: os contadores são as abas */
+.filas{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.fila{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px 13px;text-align:left;cursor:pointer;position:relative}
+.fila .n{font-family:var(--serif);font-size:32px;font-weight:600;line-height:1}
+.fila .l{font-size:12.5px;font-weight:700;margin-top:6px}
+.fila .d{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.fila.on{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.fila.urg .n{color:var(--warn)}
+.fila.ok .n{color:var(--ok)}
+
+.filtros{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:16px}
+.grupo{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grupo>span{font-size:12px;color:var(--muted);margin-right:2px}
+.chip{border:1px solid var(--line);background:var(--white);border-radius:20px;padding:5px 12px;font-size:12.5px;font-weight:600;cursor:pointer}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:0}
+
+/* cartões */
+.lista{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--fc,var(--accent));border-radius:12px;display:grid;grid-template-columns:minmax(220px,300px) 1fr;overflow:hidden}
+.info{padding:15px 16px;border-right:1px solid var(--line);background:var(--surface)}
+.nm{font-weight:700;font-size:14.5px;line-height:1.3}
+.mt{color:var(--muted);font-size:12.5px;margin-top:3px}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}
+.pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:var(--paper);white-space:nowrap}
+.pill.fr{color:#fff;background:var(--fc)}
+.pill.venc{background:var(--warn-soft);color:var(--warn)}
+.gancho{font-size:12.5px;color:var(--muted);font-style:italic;border-left:2px solid var(--line);padding-left:8px;line-height:1.45;margin:8px 0}
+.hist{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--muted)}
+.hist li{padding:3px 0 3px 14px;position:relative;line-height:1.4}
+.hist li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--line)}
+.hist li.feito::before{background:var(--ok)}
+.hist li.prox::before{background:var(--warn)}
+.msg{padding:15px 16px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.msg label{font-size:12px;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;gap:10px}
+.msg textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--surface);line-height:1.5;font-size:13.5px}
+.msg textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px var(--accent-soft)}
+.enviada{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:9px;padding:10px 12px;white-space:pre-wrap;line-height:1.5;max-height:110px;overflow:auto}
+.acoes{display:flex;flex-wrap:wrap;gap:7px}
+.btn{border:1px solid var(--line);background:var(--white);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent-2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
+.btn.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.btn.quiet{background:none;border-color:transparent;color:var(--muted)}
+.btn.quiet:hover{color:var(--danger)}
+details.banco{font-size:12px;color:var(--muted)}
+details.banco summary{cursor:pointer;font-weight:600}
+details.banco pre{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:11.5px;line-height:1.45;margin:8px 0 0;color:var(--ink)}
+.vazio{background:var(--white);border:1px dashed var(--line);border-radius:12px;padding:34px 20px;text-align:center;color:var(--muted)}
+.vazio b{display:block;color:var(--ink);font-family:var(--serif);font-size:17px;margin-bottom:4px}
+
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--paper);padding:11px 14px 11px 16px;border-radius:10px;font-size:13px;display:flex;gap:14px;align-items:center;max-width:min(560px,calc(100vw - 32px));transition:opacity .2s,transform .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast button{background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;padding:0}
+.rodape{margin-top:26px;font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+
+@media (max-width:1100px){.filas{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:860px){
+ body{display:block}
+ aside{display:none}
+ main{height:auto;overflow:visible;padding:16px 14px 40px}
+ .card{grid-template-columns:1fr}
+ .info{border-right:0;border-bottom:1px solid var(--line)}
+ .busca{margin-left:0;width:100%}
+ .filas{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<aside>
+ <div class="logo"><div class="burst">✳</div><div><b>Prospector</b><span>App Routine Tech</span></div></div>
+ <nav>
+  <button onclick="location.href='/dashboard.html'">Painel</button>
+  <button class="on">Disparos <span class="qt" id="qtNav">0</span></button>
+ </nav>
+ <div class="side-foot" id="sideFoot">Os disparos de todos os chats e do Claude Code, lidos do prospector.db.</div>
+</aside>
+
+<main>
+ <div class="aviso" id="avisos" hidden></div>
+
+ <div class="topbar">
+  <div>
+   <h1>Disparos</h1>
+   <div class="upd">Todas as frentes num lugar só · hoje é <span id="hoje"></span></div>
+  </div>
+  <input class="busca" id="busca" type="search" placeholder="Buscar por nome, cidade ou texto" aria-label="Buscar">
+  <button class="btn" id="atualizar">Atualizar e importar entrada</button>
+ </div>
+
+ <div class="filas" id="filas" role="tablist" aria-label="Filas"></div>
+ <div class="filtros">
+  <div class="grupo" id="fFrente"></div>
+  <div class="grupo" id="fCanal"></div>
+ </div>
+ <div class="lista" id="lista"><div class="vazio"><b>Carregando…</b></div></div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="toastUndo">Desfazer</button></div>
+
+<script>
+const FRENTES = {
+ ingressos:{nome:'Ingressos', cor:'var(--f-ing)'},
+ decoracao:{nome:'Decoração de festas', cor:'var(--f-dec)'},
+ sites:{nome:'Sites', cor:'var(--f-sites)'}
+};
+const CANAIS = {whatsapp:'WhatsApp', instagram:'Instagram', email:'E-mail', messenger:'Messenger'};
+const FILAS = [
+ {id:'enviar', nome:'A enviar', desc:'mensagem pronta, ainda não saiu'},
+ {id:'followup', nome:'Follow-up hoje', desc:'enviado há 4+ dias, sem resposta', cls:'urg'},
+ {id:'aguardando', nome:'Aguardando', desc:'enviado, dentro do prazo'},
+ {id:'responderam', nome:'Responderam', desc:'conversa em andamento', cls:'ok'},
+ {id:'encerrados', nome:'Encerrados', desc:'recusa ou sem resposta'}
+];
+let HOJE = new Date().toISOString().slice(0,10);
+let itens = [], filaAtual = 'enviar', frenteAtual = 'todas', canalAtual = 'todos', termo = '', ultimo = null, toastTimer;
+const timers = {};
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const br = d => d ? d.slice(8,10)+'/'+d.slice(5,7) : '';
+const dias = (a,b) => Math.round((new Date(b+'T12:00:00') - new Date(a+'T12:00:00'))/864e5);
+const corFrente = f => (FRENTES[f]||{cor:'var(--accent)'}).cor;
+const nomeFrente = f => (FRENTES[f]||{nome:f||'Outra'}).nome;
+
+async function api(url, opt={}){
+ const r = await fetch(url, {headers:{'Content-Type':'application/json'}, ...opt});
+ const j = await r.json().catch(()=>({erro:'resposta inválida'}));
+ if(!r.ok) throw new Error(j.erro || ('erro '+r.status));
+ return j;
+}
+
+async function carregar(importar){
+ try{
+  const j = await api('/api/disparos' + (importar ? '?importar=1' : ''));
+  HOJE = j.hoje || HOJE; itens = j.disparos || [];
+  document.getElementById('hoje').textContent = br(HOJE) + '/' + HOJE.slice(0,4);
+  const av = document.getElementById('avisos');
+  const linhas = [];
+  if(j.importacao && j.importacao.arquivos) linhas.push(`<b>Importado da entrada:</b> ${j.importacao.arquivos} arquivo(s), ${j.importacao.disparosNovos} disparo(s) novo(s), ${j.importacao.leadsNovos} lead(s) novo(s), ${j.importacao.repetidos} repetido(s).`);
+  (j.avisos||[]).forEach(a => linhas.push('<b>Arquivo não importado:</b> ' + esc(a)));
+  av.hidden = !linhas.length; av.innerHTML = linhas.join('<br>');
+  render();
+ }catch(e){
+  document.getElementById('lista').innerHTML = `<div class="vazio"><b>Não deu para ler o banco</b>${esc(e.message)}. Abra esta página pelo servidor (iniciar-dashboard.bat), não com duplo clique no arquivo.</div>`;
+ }
+}
+
+function filaDe(d){
+ const st = d.lead_status || 'novo';
+ if(d.encerradoEm || st === 'descartado') return 'encerrados';
+ if(d.respondeuEm || st === 'respondeu' || st === 'fechado') return 'responderam';
+ if(!d.enviadoEm) return 'enviar';
+ if(!d.followupEnviadoEm && d.followupEm && d.followupEm <= HOJE) return 'followup';
+ return 'aguardando';
+}
+
+function passa(d){
+ if(frenteAtual!=='todas' && d.frente!==frenteAtual) return false;
+ if(canalAtual!=='todos' && d.canal!==canalAtual) return false;
+ if(termo){
+  const t = [d.lead_nome, d.lead_cidade, d.mensagem, d.lead_motivo, d.contato].join(' ').toLowerCase();
+  if(!t.includes(termo)) return false;
+ }
+ return true;
+}
+
+function renderFilas(){
+ const base = itens.filter(passa);
+ document.getElementById('filas').innerHTML = FILAS.map(f=>{
+  const n = base.filter(d=>filaDe(d)===f.id).length;
+  return `<button class="fila ${f.cls||''} ${filaAtual===f.id?'on':''}" role="tab" aria-selected="${filaAtual===f.id}" data-fila="${f.id}">
+   <div class="n">${n}</div><div class="l">${f.nome}</div><div class="d">${f.desc}</div></button>`;
+ }).join('');
+ document.getElementById('qtNav').textContent = itens.filter(d=>['enviar','followup'].includes(filaDe(d))).length;
+}
+
+function renderChips(){
+ const frentes = [...new Set(itens.map(d=>d.frente))];
+ document.getElementById('fFrente').innerHTML = '<span>Frente</span>' + [['todas','Todas',null], ...frentes.map(k=>[k,nomeFrente(k),corFrente(k)])]
+  .map(([k,n,c])=>`<button class="chip ${frenteAtual===k?'on':''}" data-frente="${esc(k)}">${c?`<i style="background:${c}"></i>`:''}${esc(n)}</button>`).join('');
+ const canais = [...new Set(itens.map(d=>d.canal))];
+ document.getElementById('fCanal').innerHTML = '<span>Canal</span>' + [['todos','Todos'], ...canais.map(k=>[k,CANAIS[k]||k])]
+  .map(([k,n])=>`<button class="chip ${canalAtual===k?'on':''}" data-canal="${esc(k)}">${esc(n)}</button>`).join('');
+}
+
+function linkCanal(d, texto){
+ if(d.canal==='whatsapp'){
+  const bruto = String(d.contato || d.lead_whatsapp || '').trim();
+  if(/^https?:\/\//i.test(bruto)) return bruto;               // wa.link / wa.me/message: sem número, abre o link
+  if(/^message\//i.test(bruto)) return 'https://wa.me/' + bruto;
+  let n = bruto.replace(/\D/g,'');
+  if(!n) return null;
+  if(!n.startsWith('55')) n = '55' + n;
+  return 'https://wa.me/' + n + '?text=' + encodeURIComponent(texto);
+ }
+ if(d.canal==='instagram'){
+  const c = String(d.contato||'');
+  if(/^https?:\/\//.test(c)) return c;
+  if(c.startsWith('@')) return 'https://www.instagram.com/' + c.slice(1) + '/';
+  return d.lead_siteAntigo && d.lead_siteAntigo.includes('instagram.com') ? d.lead_siteAntigo : null;
+ }
+ if(d.canal==='email'){
+  const para = d.contato || d.lead_email; if(!para) return null;
+  return 'mailto:' + para + '?subject=' + encodeURIComponent(d.assunto||'') + '&body=' + encodeURIComponent(texto);
+ }
+ if(d.canal==='messenger') return /^https?:\/\//.test(d.contato||'') ? d.contato : null;
+ return null;
+}
+
+function historico(d){
+ const it = [`<li class="feito">Mensagem criada em ${br(d.criadoEm)}</li>`];
+ if(d.enviadoEm) it.push(`<li class="feito">Enviada por ${CANAIS[d.canal]||d.canal} em ${br(d.enviadoEm)}</li>`);
+ if(d.followupEnviadoEm) it.push(`<li class="feito">Follow-up enviado em ${br(d.followupEnviadoEm)}</li>`);
+ else if(d.enviadoEm && d.followupEm && !d.respondeuEm && !d.encerradoEm) it.push(`<li class="prox">Follow-up previsto para ${br(d.followupEm)}</li>`);
+ if(d.respondeuEm) it.push(`<li class="feito">Respondeu em ${br(d.respondeuEm)}</li>`);
+ if(d.encerradoEm) it.push(`<li>Encerrado em ${br(d.encerradoEm)}${d.motivo?': '+esc(d.motivo):''}</li>`);
+ return `<ul class="hist">${it.join('')}</ul>`;
+}
+
+function card(d){
+ const fila = filaDe(d), atraso = fila==='followup' ? dias(d.followupEm,HOJE) : 0;
+ const nomeCanal = CANAIS[d.canal]||d.canal;
+ const btnAbrir = campo => `<button class="btn" data-acao="abrir" data-campo="${campo}" data-id="${d.id}">Abrir no ${nomeCanal}</button>`;
+ const btnCopiar = campo => `<button class="btn" data-acao="copiar" data-campo="${campo}" data-id="${d.id}">Copiar mensagem</button>`;
+ let corpo='', acoes='';
+ if(fila==='enviar'){
+  corpo = `<label for="m${d.id}">Mensagem${d.canal==='email'?' <span>Assunto abaixo</span>':''}</label>
+   <textarea id="m${d.id}" data-campo="mensagem" data-id="${d.id}">${esc(d.mensagem)}</textarea>
+   ${d.canal==='email'?`<input class="busca" style="width:100%;margin:0" data-campo="assunto" data-id="${d.id}" value="${esc(d.assunto)}" placeholder="Assunto do e-mail" aria-label="Assunto">`:''}`;
+  acoes = `${btnAbrir('mensagem')}${btnCopiar('mensagem')}<button class="btn pri" data-acao="enviado" data-id="${d.id}">Marcar como enviada</button>
+   <button class="btn quiet" data-acao="descartar" data-id="${d.id}">Descartar lead</button>`;
+ } else if(fila==='followup'){
+  const fup = d.followupMsg || 'Oi! Conseguiu ver a mensagem que te mandei? Se quiser, te mostro rapidinho como funciona. E se não for o momento, sem problema.';
+  corpo = `<label>Primeira mensagem, enviada em ${br(d.enviadoEm)}</label><div class="enviada">${esc(d.mensagem)}</div>
+   <label for="f${d.id}">Follow-up (único)</label>
+   <textarea id="f${d.id}" data-campo="followupMsg" data-id="${d.id}">${esc(fup)}</textarea>`;
+  acoes = `${btnAbrir('followupMsg')}${btnCopiar('followupMsg')}<button class="btn pri" data-acao="fupEnviado" data-id="${d.id}">Marcar follow-up enviado</button>
+   <button class="btn ok" data-acao="respondeu" data-id="${d.id}">Respondeu</button>`;
+ } else if(fila==='aguardando'){
+  const quando = d.followupEnviadoEm ? `Follow-up já feito em ${br(d.followupEnviadoEm)}. Sem resposta, o lead fica quieto.`
+   : `Follow-up em ${br(d.followupEm)} (daqui a ${dias(HOJE,d.followupEm)} dia${dias(HOJE,d.followupEm)===1?'':'s'}).`;
+  corpo = `<label>Enviada em ${br(d.enviadoEm)} · ${quando}</label><div class="enviada">${esc(d.followupEnviadoEm && d.followupMsg ? d.followupMsg : d.mensagem)}</div>`;
+  acoes = `<button class="btn ok" data-acao="respondeu" data-id="${d.id}">Respondeu</button>` +
+   (d.followupEnviadoEm?`<button class="btn quiet" data-acao="encerrar" data-id="${d.id}">Encerrar sem resposta</button>`:'');
+ } else if(fila==='responderam'){
+  corpo = `<label>Última mensagem enviada</label><div class="enviada">${esc(d.mensagem)}</div>`;
+  acoes = `${btnAbrir('mensagem')}<button class="btn quiet" data-acao="descartar" data-id="${d.id}" data-motivo="Recusou.">Recusou</button>`;
+ } else {
+  corpo = `<label>Última mensagem</label><div class="enviada">${esc(d.mensagem)}</div>`;
+  acoes = d.encerradoEm ? `<button class="btn" data-acao="reabrir" data-id="${d.id}">Reabrir</button>` : '';
+ }
+ return `<article class="card" style="--fc:${corFrente(d.frente)}">
+  <div class="info">
+   <div class="nm">${esc(d.lead_nome || d.slug)}</div>
+   <div class="mt">${esc(d.lead_cidade||'')}${d.contato?' · '+esc(d.contato):''}</div>
+   <div class="pills"><span class="pill fr">${esc(nomeFrente(d.frente))}</span><span class="pill">${esc(nomeCanal)}</span>${atraso>0?`<span class="pill venc">${atraso} dia${atraso>1?'s':''} de atraso</span>`:''}</div>
+   ${d.lead_motivo?`<div class="gancho">${esc(d.lead_motivo)}</div>`:''}
+   <div class="mt">Origem: ${esc(d.origem||'—')}</div>
+   ${historico(d)}
+  </div>
+  <div class="msg">${corpo}<div class="acoes">${acoes}</div></div>
+ </article>`;
+}
+
+function renderLista(){
+ const lista = itens.filter(d=>passa(d) && filaDe(d)===filaAtual);
+ if(filaAtual==='followup' || filaAtual==='aguardando') lista.sort((a,b)=>(a.followupEm||'').localeCompare(b.followupEm||''));
+ const vaz = {
+  enviar:['Nada para enviar','Quando um chat ou o Claude Code preparar mensagens, elas aparecem aqui.'],
+  followup:['Nenhum follow-up para hoje','Os leads enviados há 4 dias ou mais, sem resposta, aparecem aqui.'],
+  aguardando:['Ninguém aguardando','Marque uma mensagem como enviada na fila "A enviar".'],
+  responderam:['Nenhuma resposta ainda','Use "Respondeu" no cartão quando alguém retornar.'],
+  encerrados:['Nada encerrado','Recusas e leads sem resposta depois do follow-up ficam aqui.']
+ }[filaAtual];
+ document.getElementById('lista').innerHTML = lista.length ? lista.map(card).join('')
+  : `<div class="vazio"><b>${vaz[0]}</b>${vaz[1]}</div>`;
+}
+
+function render(){ renderFilas(); renderChips(); renderLista(); }
+
+function toast(txt, desfazer){
+ const t = document.getElementById('toast');
+ document.getElementById('toastTxt').textContent = txt;
+ document.getElementById('toastUndo').style.display = desfazer ? '' : 'none';
+ t.classList.add('show'); clearTimeout(toastTimer);
+ toastTimer = setTimeout(()=>t.classList.remove('show'), 6000);
+}
+
+const MSG = {
+ enviado:'Marcada como enviada. O lead foi para "proposta".',
+ fupEnviado:'Follow-up registrado. Agora é aguardar.',
+ respondeu:'Foi para "Responderam".',
+ encerrar:'Encerrado sem resposta.',
+ descartar:'Encerrado.',
+ reabrir:'Reaberto.'
+};
+
+async function executar(id, nome, corpo={}){
+ try{
+  const r = await api(`/api/disparos/${id}/${nome}`, {method:'POST', body:JSON.stringify(corpo)});
+  ultimo = {id, antes:r.antes};
+  await carregar(false);
+  toast(MSG[nome]||'Feito.', true);
+ }catch(e){ toast('Não salvou: ' + e.message, false); }
+}
+
+async function salvarCampo(el){
+ const id = +el.dataset.id, campo = el.dataset.campo;
+ const d = itens.find(x=>x.id===id); if(d) d[campo] = el.value;
+ try{ await api(`/api/disparos/${id}`, {method:'PUT', body:JSON.stringify({[campo]:el.value})}); }
+ catch(e){ toast('Texto não salvou: ' + e.message, false); }
+}
+
+document.addEventListener('click', async e=>{
+ const f = e.target.closest('[data-fila]'); if(f){ filaAtual = f.dataset.fila; render(); return; }
+ const fr = e.target.closest('[data-frente]'); if(fr){ frenteAtual = fr.dataset.frente; render(); return; }
+ const ca = e.target.closest('[data-canal]'); if(ca){ canalAtual = ca.dataset.canal; render(); return; }
+ const b = e.target.closest('[data-acao]'); if(!b) return;
+ const id = +b.dataset.id, d = itens.find(x=>x.id===id), a = b.dataset.acao;
+ if(a==='abrir'){
+  const texto = d[b.dataset.campo] || d.mensagem || '';
+  const url = linkCanal(d, texto);
+  if(!url){ toast('Este lead não tem contato válido para ' + (CANAIS[d.canal]||d.canal) + '. Use "Copiar mensagem".', false); return; }
+  const colar = d.canal==='instagram' || d.canal==='messenger' || (d.canal==='whatsapp' && !url.includes('?text='));
+  if(colar) navigator.clipboard?.writeText(texto).catch(()=>{});
+  window.open(url, '_blank', 'noopener');
+  if(colar) toast((d.canal==='whatsapp' ? 'Conversa aberta' : 'Perfil aberto') + ' e mensagem copiada. Cole na conversa.', false);
+  return;
+ }
+ if(a==='copiar'){
+  const txt = d[b.dataset.campo] || '';
+  (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(
+   ()=>toast('Mensagem copiada.', false), ()=>toast('Não deu para copiar neste navegador.', false));
+  return;
+ }
+ if(a==='descartar' || a==='encerrar'){
+  const padrao = b.dataset.motivo || (a==='encerrar' ? 'Sem resposta depois do follow-up.' : '');
+  const motivo = prompt('Motivo (fica anotado no lead):', padrao);
+  if(motivo===null) return;
+  return executar(id, a, {motivo: motivo || padrao || 'Descartado.'});
+ }
+ executar(id, a);
+});
+
+document.addEventListener('input', e=>{
+ const t = e.target;
+ if(t.dataset && t.dataset.campo && t.dataset.id){
+  clearTimeout(timers[t.dataset.id+t.dataset.campo]);
+  timers[t.dataset.id+t.dataset.campo] = setTimeout(()=>salvarCampo(t), 700);
+ }
+ if(t.id==='busca'){ termo = t.value.trim().toLowerCase(); renderFilas(); renderLista(); }
+});
+
+document.getElementById('toastUndo').addEventListener('click', async ()=>{
+ if(!ultimo) return;
+ const u = ultimo; ultimo = null;
+ try{
+  await api(`/api/disparos/${u.id}/restaurar`, {method:'POST', body:JSON.stringify({antes:u.antes})});
+  await carregar(false); toast('Desfeito.', false);
+ }catch(e){ toast('Não deu para desfazer: ' + e.message, false); }
+});
+document.getElementById('atualizar').addEventListener('click', ()=>carregar(true));
+
+carregar(true);
+</script>
+</body>
+</html>
