@@ -35,3 +35,4 @@ A senha do cPanel nunca é digitada no chat: você preenche o campo `"senha"` no
 
 ---
 
+Baseado no plugin original de Helio Arreche (ArrecheNeto/PROSPECTOR-DE-SITES), adaptado por Solon (App Routine Tech).
