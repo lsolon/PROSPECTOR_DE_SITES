@@ -16,7 +16,7 @@ CONFIG = os.path.join(PASTA, 'prospector-config.json')
 def ler_config():
     try: return json.load(open(CONFIG, encoding='utf-8'))
     except Exception: return {}
-PORTA = 8765
+PORTA = int(os.environ.get("PROSPECTOR_PORTA", 8765))
 CAMPOS = ['slug','nome','nicho','cidade','nota','avaliacoes','email','telefone','whatsapp',
           'siteAntigo','motivo','status','urlNova','dataProposta','valor','obs',
           'contratoStatus','contratoEm','manutencao','pago','docCliente','endCliente']

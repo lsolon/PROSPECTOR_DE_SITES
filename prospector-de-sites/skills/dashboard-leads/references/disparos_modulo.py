@@ -13,13 +13,15 @@ Integração com o servidor (2 linhas, no começo de do_GET / do_POST / do_PUT):
     if dm.tratar(self, 'GET'): return      # (ou 'POST' / 'PUT')
 """
 import json, os, re, shutil, sqlite3, datetime
+import rastreio_modulo as rm   # link rastreável: codigo_rastreio, aberturas, métricas
 
 ORDEM = {'novo': 0, 'redesenhado': 1, 'publicado': 2, 'proposta': 3, 'respondeu': 4, 'fechado': 5}
 CANAIS = {'whatsapp', 'instagram', 'email', 'messenger'}
-CAMPOS_EDITAVEIS = {'mensagem', 'followupMsg', 'apresentacaoMsg', 'assunto', 'contato', 'canal', 'frente', 'followupEm'}
+CAMPOS_EDITAVEIS = {'mensagem', 'followupMsg', 'apresentacaoMsg', 'respostaMsg', 'assunto', 'contato', 'canal', 'frente', 'followupEm'}
 CAMPOS_DISPARO = ['slug', 'frente', 'canal', 'contato', 'assunto', 'mensagem', 'followupMsg', 'script',
                   'origem', 'criadoEm', 'enviadoEm', 'followupEm', 'followupEnviadoEm',
-                  'respondeuEm', 'encerradoEm', 'motivo', 'apresentacaoMsg', 'apresentacaoEm']
+                  'respondeuEm', 'encerradoEm', 'motivo', 'apresentacaoMsg', 'apresentacaoEm', 'conversa', 'respostaMsg',
+                  'codigo_rastreio', 'enviado_em', 'respondeu_em']
 DIAS_FOLLOWUP = 4
 AVISOS = []          # avisos da última importação (o painel mostra)
 
@@ -46,9 +48,12 @@ def garantir_tabela(c):
     cols = [r[1] for r in c.execute('PRAGMA table_info(disparos)')]
     for col in ('statusAntes',        # status do lead antes de encerrar (Reabrir)
                 'apresentacaoMsg',    # segunda mensagem opcional, com a apresentação/modelo
-                'apresentacaoEm'):
+                'apresentacaoEm',
+                'conversa',           # JSON: [{"quem": "cliente"|"eu", "texto": ..., "em": AAAA-MM-DD}]
+                'respostaMsg'):       # rascunho da próxima resposta
         if col not in cols:
             c.execute('ALTER TABLE disparos ADD COLUMN %s TEXT' % col)
+    rm.garantir_tabelas(c)
 
 
 def colunas_leads(c):
@@ -129,7 +134,7 @@ def acao(c, id_, nome, corpo=None):
     h = corpo.get('hoje') or hoje()
     upd = {}
     if nome == 'enviado':
-        upd = {'enviadoEm': h, 'followupEm': mais_dias(h, DIAS_FOLLOWUP)}
+        upd = {'enviadoEm': h, 'followupEm': mais_dias(h, DIAS_FOLLOWUP), 'enviado_em': corpo.get('agora') or rm.agora()}
         lead = _lead(c, d['slug'])
         extra = {} if (lead and lead['dataProposta']) else {'dataProposta': h}
         _avancar(c, d['slug'], 'proposta', extra)
@@ -137,6 +142,22 @@ def acao(c, id_, nome, corpo=None):
                 upd['followupEm'][8:] + '/' + upd['followupEm'][5:7]))
     elif nome == 'fupEnviado':
         upd = {'followupEnviadoEm': h}
+    elif nome in ('clienteDisse', 'respostaEnviada'):   # conversa depois da resposta do cliente
+        texto = (corpo.get('texto') or '').strip()
+        if not texto:
+            raise ValueError('texto vazio')
+        conversa = json.loads(d.get('conversa') or '[]')
+        conversa.append({'quem': 'cliente' if nome == 'clienteDisse' else 'eu', 'texto': texto, 'em': h})
+        upd = {'conversa': json.dumps(conversa, ensure_ascii=False)}
+        if nome == 'clienteDisse':
+            if not d.get('respondeuEm'):
+                upd['respondeuEm'] = h
+            if not d.get('respondeu_em'):
+                upd['respondeu_em'] = corpo.get('agora') or rm.agora()
+            _avancar(c, d['slug'], 'respondeu')
+        else:
+            upd['respostaMsg'] = None
+            _anotar(c, d['slug'], 'resposta enviada %s' % (h[8:] + '/' + h[5:7]))
     elif nome == 'apresentacao':       # segunda mensagem opcional, depois do primeiro contato
         upd = {'apresentacaoEm': h}
         if corpo.get('texto'):
@@ -144,6 +165,8 @@ def acao(c, id_, nome, corpo=None):
         _anotar(c, d['slug'], 'apresentação enviada %s' % (h[8:] + '/' + h[5:7]))
     elif nome == 'respondeu':
         upd = {'respondeuEm': h}
+        if not d.get('respondeu_em'):
+            upd['respondeu_em'] = corpo.get('agora') or rm.agora()
         _avancar(c, d['slug'], 'respondeu')
     elif nome in ('encerrar', 'descartar'):
         motivo = corpo.get('motivo') or ('Sem resposta depois do follow-up.' if nome == 'encerrar' else 'Descartado.')
@@ -175,6 +198,8 @@ def acao(c, id_, nome, corpo=None):
     if upd:
         c.execute('UPDATE disparos SET %s, atualizado=datetime("now","localtime") WHERE id=?' %
                   ','.join('%s=?' % k for k in upd), list(upd.values()) + [id_])
+    if d.get('codigo_rastreio') and nome in ('enviado', 'restaurar'):
+        rm.recalcular(c, [d['codigo_rastreio']])     # a regra dos 15 s depende do enviado_em
     return antes
 
 
@@ -190,11 +215,27 @@ def editar(c, id_, campos):
 # ---------------------------------------------------------------- importação
 
 def gravar_disparo(c, dsp, origem):
-    """Insere um disparo se não houver um igual (mesmo slug + canal + mensagem)."""
-    existe = c.execute('SELECT 1 FROM disparos WHERE slug=? AND canal=? AND mensagem=?',
-                       (dsp['slug'], dsp['canal'], dsp['mensagem'])).fetchone()
-    if existe:
-        return False
+    """Insere um disparo se não houver um igual (mesmo slug + canal + mensagem, sem contar o ?l=<codigo>)."""
+    base = rm.sem_codigo(dsp['mensagem'])
+    for (m,) in c.execute('SELECT mensagem FROM disparos WHERE slug=? AND canal=?', (dsp['slug'], dsp['canal'])).fetchall():
+        if rm.sem_codigo(m) == base:
+            return False
+    dsp = dict(dsp)
+    textos = ('mensagem', 'followupMsg', 'apresentacaoMsg')
+    cod = (dsp.get('codigo_rastreio') or '').lower() or None
+    if cod and c.execute('SELECT 1 FROM disparos WHERE codigo_rastreio=?', (cod,)).fetchone():
+        novo = rm.novo_codigo(c)                  # código já usado: troca nos textos também
+        for k in textos:
+            if dsp.get(k):
+                dsp[k] = dsp[k].replace('l=' + cod, 'l=' + novo)
+        cod = novo
+    if not cod and rm.RE_LINK_ART.search(' '.join(dsp.get(k) or '' for k in textos)):
+        cod = rm.novo_codigo(c)                   # JSON antigo, sem código: rastreia do mesmo jeito
+    if cod:
+        dsp['codigo_rastreio'] = cod
+        for k in textos:
+            if dsp.get(k):
+                dsp[k] = rm.marcar_links(dsp[k], cod)
     campos = {k: dsp.get(k) for k in CAMPOS_DISPARO if dsp.get(k) not in (None, '')}
     campos.setdefault('origem', origem)
     c.execute('INSERT INTO disparos (%s) VALUES (%s)' % (','.join(campos), ','.join('?' * len(campos))),
@@ -300,6 +341,8 @@ def _caminhos(handler):
 def tratar(handler, metodo):
     """Responde às rotas /api/disparos*. Devolve True se a rota era dele."""
     caminho = handler.path.split('?')[0].rstrip('/')
+    if caminho.startswith('/api/rastreio'):
+        return rm.tratar(handler, metodo, *_caminhos(handler))
     if not caminho.startswith('/api/disparos'):
         return False
     pasta, db = _caminhos(handler)
@@ -311,6 +354,7 @@ def tratar(handler, metodo):
             resumo = None
             if 'importar=1' in handler.path:
                 resumo = importar_entrada(c, os.path.join(pasta, 'entrada'))
+                rm.preparar_pendentes(c); c.commit()
             handler._json(200, {'hoje': hoje(), 'disparos': listar(c), 'avisos': AVISOS, 'importacao': resumo})
             return True
         if metodo == 'POST' and len(partes) == 5 and partes[3].isdigit():

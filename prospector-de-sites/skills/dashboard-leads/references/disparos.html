@@ -80,6 +80,14 @@ main{flex:1;min-width:0;height:100%;overflow-y:auto;padding:22px 28px 40px}
 .pill.fr{color:#fff;background:var(--fc)}
 .pill.venc{background:var(--warn-soft);color:var(--warn)}
 .gancho{font-size:12.5px;color:var(--muted);font-style:italic;border-left:2px solid var(--line);padding-left:8px;line-height:1.45;margin:8px 0}
+.conv{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:6px}
+.conv li{padding:8px 10px;border-radius:8px;font-size:13px;line-height:1.45;white-space:pre-wrap;max-width:92%}
+.conv li.eu{background:var(--paper);border:1px solid var(--line);align-self:flex-end}
+.conv li.cliente{background:#e8f0e6;align-self:flex-start}
+.conv li small{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+.chips-resp{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.chips-resp button{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:none;cursor:pointer}
+.chips-resp button:hover{border-color:var(--accent);color:var(--accent)}
 .apres{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
 .apres summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent)}
 .apres textarea{margin-top:8px}
@@ -112,6 +120,44 @@ details.banco pre{background:var(--surface);border:1px solid var(--line);border-
 .toast button{background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;padding:0}
 .rodape{margin-top:26px;font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 
+/* rastreio e métricas */
+.rast{font-size:12px;margin-top:8px;padding:7px 9px;border-radius:8px;background:var(--paper);line-height:1.45}
+.rast b{font-weight:700}
+.rast.aberto{background:var(--ok-soft);color:var(--ok)}
+.rast.nao{background:var(--warn-soft);color:var(--warn)}
+.rast button{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font-size:11.5px}
+.rast ul{margin:6px 0 0;padding-left:16px;color:var(--ink)}
+.rast ul li.bot{color:var(--muted);text-decoration:line-through}
+.vista{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--white)}
+.vista button{border:0;background:none;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.vista button.on{background:var(--ink);color:var(--paper)}
+.met h2{font-family:var(--serif);font-size:19px;font-weight:600;margin:26px 0 4px}
+.met .sub{color:var(--muted);font-size:12.5px;margin:0 0 12px;line-height:1.45}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tile .n{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1}
+.tile .l{font-size:12.5px;font-weight:700;margin-top:6px}
+.tile .d{font-size:11.5px;color:var(--muted);margin-top:2px}
+.tab{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px}
+.tab th,.tab td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tab th:first-child,.tab td:first-child{text-align:left}
+.tab th{font-size:11.5px;color:var(--muted);font-weight:700;background:var(--surface)}
+.tab tr:last-child td{border-bottom:0}
+.rolar{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.calor{display:grid;grid-template-columns:42px repeat(24,minmax(22px,1fr));gap:2px;min-width:640px;font-size:10.5px}
+.calor .h,.calor .dl{color:var(--muted);display:flex;align-items:center;justify-content:center}
+.calor .dl{justify-content:flex-start;font-weight:700}
+.calor .c{height:28px;border-radius:4px;background:var(--paper);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:default}
+.calor .c.v{color:#fff;font-weight:700}
+.calor .c:hover{outline:2px solid var(--ink)}
+.leg{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.leg i{display:inline-block;width:22px;height:12px;border-radius:3px}
+.dica{position:fixed;pointer-events:none;background:var(--ink);color:var(--paper);font-size:12px;padding:7px 10px;border-radius:8px;line-height:1.4;z-index:30;display:none;max-width:240px}
+.fup{display:flex;flex-direction:column;gap:8px}
+.fup .item{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.fup .item b{font-size:13.5px}
+.fup .item span{color:var(--muted);font-size:12.5px}
+.fup .item .btn{margin-left:auto}
 @media (max-width:1100px){.filas{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:860px){
  body{display:block}
@@ -121,6 +167,7 @@ details.banco pre{background:var(--surface);border:1px solid var(--line);border-
  .info{border-right:0;border-bottom:1px solid var(--line)}
  .busca{margin-left:0;width:100%}
  .filas{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
@@ -144,8 +191,10 @@ details.banco pre{background:var(--surface);border:1px solid var(--line);border-
    <div class="upd">Todas as frentes num lugar só · hoje é <span id="hoje"></span></div>
   </div>
   <input class="busca" id="busca" type="search" placeholder="Buscar por nome, cidade ou texto" aria-label="Buscar">
+  <div class="vista" role="tablist" aria-label="Vista"><button class="on" data-vista="cards" role="tab">Cards</button><button data-vista="metricas" role="tab">Métricas</button></div>
   <button class="btn" id="atualizar">Atualizar e importar entrada</button>
  </div>
+ <div id="vCards">
 
  <div class="filas" id="filas" role="tablist" aria-label="Filas"></div>
  <div class="filtros">
@@ -153,7 +202,10 @@ details.banco pre{background:var(--surface);border:1px solid var(--line);border-
   <div class="grupo" id="fCanal"></div>
  </div>
  <div class="lista" id="lista"><div class="vazio"><b>Carregando…</b></div></div>
+ </div>
+ <div class="met" id="vMetricas" hidden></div>
 </main>
+<div class="dica" id="dica" role="tooltip"></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="toastUndo">Desfazer</button></div>
 
@@ -172,15 +224,66 @@ const FILAS = [
  {id:'encerrados', nome:'Encerrados', desc:'recusa ou sem resposta'}
 ];
 let HOJE = new Date().toISOString().slice(0,10);
+/* Modelos de resposta (depois que o cliente responde), por frente. [escola] vira o nome do lead. */
+const RESPOSTAS = {
+ ingressos: {
+  'Quer ver': 'Que bom! Preparei uma apresentação rápida: dá para passar as telas, do site até o PIX, ou assistir ao vídeo de 1 minuto da compra sendo feita.\n\nhttps://approutinetech.com.br/clientes/studio-arte/apresentacao/\n\nSe preferir, faço uma chamada de vídeo rapidinha (uns 15 minutos) e mostro tudo ao vivo. Qual dia e horário ficam bons?\n\nE para eu já preparar a conversa: em qual teatro vocês costumam se apresentar, quantos lugares ele tem e quando é o espetáculo deste ano?',
+  'Perguntou preço': 'Depende do tamanho do evento: lugares do teatro (ou lotação do espaço), número de alunos e quantos espetáculos por ano. Para eu te passar um valor certo, podemos fazer uma chamada rápida de uns 15 minutos? Aproveito e mostro o sistema funcionando. Qual dia e horário ficam bons?',
+  'Já tem plataforma': 'Obrigado pelo retorno! Faz todo sentido seguir com o que já está combinado para este ano. Fico à disposição para o próximo espetáculo. Se quiserem um site da [escola] com a página do espetáculo, ele funciona junto com a plataforma que vocês já usam. Sucesso!',
+  'Não é o momento': 'Imagina, obrigado pelo retorno! Faz todo sentido. Sucesso no espetáculo! Se um dia precisarem de algo, é só chamar. Um abraço!'
+ },
+ _padrao: {
+  'Quer ver': 'Que bom! Vou te mostrar como ficaria para a [escola]. Posso te ligar ou fazer uma chamada rápida de uns 15 minutos? Qual dia e horário ficam bons?',
+  'Perguntou preço': 'Depende do que vocês precisam (quantas páginas, se tem agendamento, catálogo etc.). Para eu te passar um valor certo, podemos conversar uns 15 minutos? Qual dia e horário ficam bons?',
+  'Não é o momento': 'Imagina, obrigado pelo retorno! Faz todo sentido. Se um dia precisarem, é só chamar. Um abraço!'
+ }
+};
+function modelosDe(d){ return RESPOSTAS[d.frente] || RESPOSTAS._padrao; }
+function preencher(t, d){ return t.replace(/\[escola\]/g, d.lead_nome || 'vocês'); }
+function conversaDe(d){ try{ return JSON.parse(d.conversa || '[]'); }catch(e){ return []; } }
+function pedidoClaude(d){
+ const conv = conversaDe(d).map(m => (m.quem==='cliente' ? 'Cliente' : 'Eu') + ' (' + br(m.em) + '): ' + m.texto).join('\n\n');
+ return 'Me ajude a responder um lead da prospecção. Escreva só a minha próxima mensagem, curta, para ' + (CANAIS[d.canal]||d.canal) + ', no meu tom (Solon, da App Routine Tech), sem preço por mensagem e sem prometer o que o sistema não faz' + (d.frente==='ingressos' ? ' (siga a skill sistema-ingressos-prospeccao)' : '') + '.\n\n'
+  + 'Lead: ' + (d.lead_nome||d.slug) + (d.lead_cidade ? ' · ' + d.lead_cidade : '') + '\nFrente: ' + nomeFrente(d.frente) + (d.lead_motivo ? '\nContexto: ' + d.lead_motivo : '') + '\n\n'
+  + 'Minha primeira mensagem (' + br(d.enviadoEm||d.criadoEm) + '):\n' + d.mensagem + (conv ? '\n\nConversa depois disso:\n' + conv : '') + '\n\n'
+  + 'Rascunho que eu já tenho (pode ignorar ou melhorar):\n' + (d.respostaMsg || '(nenhum)');
+}
 /* Segunda mensagem opcional (depois do primeiro contato), por frente. Edite os textos e links aqui. */
 const APRESENTACAO = {
  ingressos: 'Para vocês verem com calma, preparei uma apresentação rápida do sistema, com um vídeo de 1 minuto mostrando a compra:\nhttps://approutinetech.com.br/clientes/studio-arte/apresentacao/\n\nSe fizer sentido, marcamos uma conversa rápida para eu entender o espetáculo de vocês.',
  decoracao: 'Para você ver com calma, este é o exemplo de site que montei para decoração de festas:\nhttps://approutinetech.com.br/modelos/decoracao-festas/\n\nSe fizer sentido, preparo um com as fotos e os temas de vocês.'
 };
 function apresPadrao(d){
- if(APRESENTACAO[d.frente]) return APRESENTACAO[d.frente];
- if(d.lead_urlNova) return 'Para você ver com calma, esta é a prévia que preparei para vocês:\n' + d.lead_urlNova + '\n\nSe fizer sentido, conversamos sobre os ajustes.';
+ if(APRESENTACAO[d.frente]) return marcarLinks(APRESENTACAO[d.frente], d.codigo_rastreio);
+ if(d.lead_urlNova) return marcarLinks('Para você ver com calma, esta é a prévia que preparei para vocês:\n' + d.lead_urlNova + '\n\nSe fizer sentido, conversamos sobre os ajustes.', d.codigo_rastreio);
  return '';
+}
+/* Rastreio: ?l=<codigo> nos links de /modelos/ e /clientes/ (mesma regra do rastreio_modulo.py) */
+function marcarLinks(t, cod){
+ if(!t || !cod) return t;
+ return t.replace(/https?:\/\/(?:www\.)?approutinetech\.com\.br\/(?:modelos|clientes)\/[^\s<>"')\]]*/gi, u=>{
+  const p = (u.match(/[.,;:!?]+$/)||[''])[0]; u = u.slice(0, u.length-p.length);
+  return /[?&]l=/.test(u) ? u+p : u + (u.includes('?')?'&':'?') + 'l=' + cod + p;
+ });
+}
+const hm = s => s ? s.slice(8,10)+'/'+s.slice(5,7)+(s.length>10?' '+s.slice(11,16):'') : '';
+function dur(min){
+ if(min==null) return '—';
+ if(min < 1) return 'menos de 1 min';
+ if(min < 60) return Math.round(min)+' min';
+ if(min < 48*60){ const h=Math.floor(min/60), m=Math.round(min%60); return h+'h'+(m?String(m).padStart(2,'0'):''); }
+ return (min/1440).toFixed(1).replace('.',',')+' dias';
+}
+const agoraLocal = () => new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,19).replace('T',' ');
+const entre = (a,b) => (a && b) ? (new Date(b.replace(' ','T')) - new Date(a.replace(' ','T')))/6e4 : null;
+function blocoRastreio(d){
+ if(!d.codigo_rastreio) return d.enviadoEm ? '<div class="rast">Link sem rastreio (enviado antes do código).</div>' : '';
+ if(!d.enviado_em) return `<div class="rast">Link rastreável · código <b>${esc(d.codigo_rastreio)}</b>. Clique em “Enviei” logo depois de enviar: a hora separa a pré-visualização do WhatsApp da abertura de verdade.</div>`;
+ const resp = d.respondeu_em ? ` · respondeu em <b>${dur(entre(d.enviado_em,d.respondeu_em))}</b>` : '';
+ const ver = `<button data-acao="verAcessos" data-id="${d.id}">ver acessos</button><div id="ac${d.id}"></div>`;
+ if(d.primeira_abertura_em) return `<div class="rast aberto">Abriu em <b>${dur(entre(d.enviado_em,d.primeira_abertura_em))}</b> (${hm(d.primeira_abertura_em)}) · ${d.total_aberturas} abertura${d.total_aberturas==1?'':'s'}${resp} · ${ver}</div>`;
+ const h = entre(d.enviado_em, agoraLocal())/60;
+ return `<div class="rast ${h>=72?'nao':''}">Ainda não abriu · enviado ${hm(d.enviado_em)}${h>=72?' (há '+Math.floor(h/24)+' dias)':''}${resp} · ${ver}</div>`;
 }
 let itens = [], filaAtual = 'enviar', frenteAtual = 'todas', canalAtual = 'todos', termo = '', ultimo = null, toastTimer;
 const timers = {};
@@ -198,8 +301,10 @@ async function api(url, opt={}){
  return j;
 }
 
+let SYNC = null;
 async function carregar(importar){
  try{
+  if(importar){ try{ SYNC = await api('/api/rastreio/sincronizar', {method:'POST', body:'{}'}); }catch(e){ SYNC = {ok:false, aviso:e.message}; } }
   const j = await api('/api/disparos' + (importar ? '?importar=1' : ''));
   HOJE = j.hoje || HOJE; itens = j.disparos || [];
   itens.forEach(d => { if(!d.apresentacaoMsg) d.apresentacaoMsg = apresPadrao(d); });
@@ -208,8 +313,10 @@ async function carregar(importar){
   const linhas = [];
   if(j.importacao && j.importacao.arquivos) linhas.push(`<b>Importado da entrada:</b> ${j.importacao.arquivos} arquivo(s), ${j.importacao.disparosNovos} disparo(s) novo(s), ${j.importacao.leadsNovos} lead(s) novo(s), ${j.importacao.repetidos} repetido(s).`);
   (j.avisos||[]).forEach(a => linhas.push('<b>Arquivo não importado:</b> ' + esc(a)));
+  if(importar && SYNC && !SYNC.ok) linhas.push('<b>Rastreio:</b> ' + esc(SYNC.aviso) + '. As aberturas aparecem quando a VPS responder.');
   av.hidden = !linhas.length; av.innerHTML = linhas.join('<br>');
   render();
+  if(vistaAtual==='metricas') carregarMetricas();
  }catch(e){
   document.getElementById('lista').innerHTML = `<div class="vazio"><b>Não deu para ler o banco</b>${esc(e.message)}. Abra esta página pelo servidor (iniciar-dashboard.bat), não com duplo clique no arquivo.</div>`;
  }
@@ -279,11 +386,11 @@ function linkCanal(d, texto){
 
 function historico(d){
  const it = [`<li class="feito">Mensagem criada em ${br(d.criadoEm)}</li>`];
- if(d.enviadoEm) it.push(`<li class="feito">Enviada por ${CANAIS[d.canal]||d.canal} em ${br(d.enviadoEm)}</li>`);
+ if(d.enviadoEm) it.push(`<li class="feito">Enviada por ${CANAIS[d.canal]||d.canal} em ${d.enviado_em?hm(d.enviado_em):br(d.enviadoEm)}</li>`);
  if(d.followupEnviadoEm) it.push(`<li class="feito">Follow-up enviado em ${br(d.followupEnviadoEm)}</li>`);
  else if(d.enviadoEm && d.followupEm && !d.respondeuEm && !d.encerradoEm) it.push(`<li class="prox">Follow-up previsto para ${br(d.followupEm)}</li>`);
  if(d.apresentacaoEm) it.push(`<li class="feito">Apresentação enviada em ${br(d.apresentacaoEm)}</li>`);
- if(d.respondeuEm) it.push(`<li class="feito">Respondeu em ${br(d.respondeuEm)}</li>`);
+ if(d.respondeuEm) it.push(`<li class="feito">Respondeu em ${d.respondeu_em?hm(d.respondeu_em):br(d.respondeuEm)}</li>`);
  if(d.encerradoEm) it.push(`<li>Encerrado em ${br(d.encerradoEm)}${d.motivo?': '+esc(d.motivo):''}</li>`);
  return `<ul class="hist">${it.join('')}</ul>`;
 }
@@ -298,7 +405,7 @@ function card(d){
   corpo = `<label for="m${d.id}">Mensagem${d.canal==='email'?' <span>Assunto abaixo</span>':''}</label>
    <textarea id="m${d.id}" data-campo="mensagem" data-id="${d.id}">${esc(d.mensagem)}</textarea>
    ${d.canal==='email'?`<input class="busca" style="width:100%;margin:0" data-campo="assunto" data-id="${d.id}" value="${esc(d.assunto)}" placeholder="Assunto do e-mail" aria-label="Assunto">`:''}`;
-  acoes = `${btnAbrir('mensagem')}${btnCopiar('mensagem')}<button class="btn pri" data-acao="enviado" data-id="${d.id}">Marcar como enviada</button>
+  acoes = `${btnAbrir('mensagem')}${btnCopiar('mensagem')}<button class="btn pri" data-acao="enviado" data-id="${d.id}">Enviei</button>
    <button class="btn quiet" data-acao="descartar" data-id="${d.id}">Descartar lead</button>`;
  } else if(fila==='followup'){
   const fup = d.followupMsg || 'Oi! Conseguiu ver a mensagem que te mandei? Se quiser, te mostro rapidinho como funciona. E se não for o momento, sem problema.';
@@ -314,8 +421,19 @@ function card(d){
   acoes = `<button class="btn ok" data-acao="respondeu" data-id="${d.id}">Respondeu</button>` +
    (d.followupEnviadoEm?`<button class="btn quiet" data-acao="encerrar" data-id="${d.id}">Encerrar sem resposta</button>`:'');
  } else if(fila==='responderam'){
-  corpo = `<label>Última mensagem enviada</label><div class="enviada">${esc(d.mensagem)}</div>`;
-  acoes = `${btnAbrir('mensagem')}<button class="btn quiet" data-acao="descartar" data-id="${d.id}" data-motivo="Recusou.">Recusou</button>`;
+  const conv = conversaDe(d);
+  const bolhas = [`<li class="eu"><small>Você · ${br(d.enviadoEm||d.criadoEm)}</small>${esc(d.followupEnviadoEm && d.followupMsg ? d.mensagem + '\n\n(follow-up) ' + d.followupMsg : d.mensagem)}</li>`]
+   .concat(conv.map(m => `<li class="${m.quem==='cliente'?'cliente':'eu'}"><small>${m.quem==='cliente'?'Cliente':'Você'} · ${br(m.em)}</small>${esc(m.texto)}</li>`));
+  const chips = Object.keys(modelosDe(d)).map(k => `<button type="button" data-modelo="${esc(k)}" data-id="${d.id}">${esc(k)}</button>`).join('');
+  corpo = `<label>Conversa</label><ul class="conv">${bolhas.join('')}</ul>
+   <label for="rc${d.id}">O que o cliente respondeu</label>
+   <textarea id="rc${d.id}" data-cliente="${d.id}" placeholder="Cole aqui a resposta do cliente" style="min-height:70px"></textarea>
+   <div class="acoes" style="margin:6px 0 14px"><button class="btn" data-acao="clienteDisse" data-id="${d.id}">Registrar resposta do cliente</button></div>
+   <label for="rr${d.id}">Sua resposta</label>
+   <div class="chips-resp">${chips}<button type="button" data-acao="sugestao" data-id="${d.id}">Pedir sugestão ao Claude</button></div>
+   <textarea id="rr${d.id}" data-campo="respostaMsg" data-id="${d.id}" placeholder="Escreva sua resposta ou use um modelo acima">${esc(d.respostaMsg||'')}</textarea>`;
+  acoes = `${btnAbrir('respostaMsg')}${btnCopiar('respostaMsg')}<button class="btn pri" data-acao="respostaEnviada" data-id="${d.id}">Marcar resposta enviada</button>
+   <button class="btn quiet" data-acao="descartar" data-id="${d.id}" data-motivo="Recusou.">Recusou</button>`;
  }
  if(['followup','aguardando','responderam'].includes(fila) && d.apresentacaoMsg){
   acoes += `<details class="apres"${d.apresentacaoEm?'':''}><summary>${d.apresentacaoEm?'Apresentação enviada em '+br(d.apresentacaoEm)+' · enviar de novo':'Enviar apresentação (opcional)'}</summary>
@@ -334,6 +452,7 @@ function card(d){
    ${d.lead_motivo?`<div class="gancho">${esc(d.lead_motivo)}</div>`:''}
    <div class="mt">Origem: ${esc(d.origem||'—')}</div>
    ${historico(d)}
+   ${blocoRastreio(d)}
   </div>
   <div class="msg">${corpo}<div class="acoes">${acoes}</div></div>
  </article>`;
@@ -364,13 +483,15 @@ function toast(txt, desfazer){
 }
 
 const MSG = {
- enviado:'Marcada como enviada. O lead foi para "proposta".',
+ enviado:'Envio registrado com a hora. O lead foi para "proposta".',
  fupEnviado:'Follow-up registrado. Agora é aguardar.',
  respondeu:'Foi para "Responderam".',
  encerrar:'Encerrado sem resposta.',
  descartar:'Encerrado.',
  reabrir:'Reaberto.',
- apresentacao:'Apresentação registrada.'
+ apresentacao:'Apresentação registrada.',
+ clienteDisse:'Resposta do cliente registrada.',
+ respostaEnviada:'Resposta registrada na conversa.'
 };
 
 async function executar(id, nome, corpo={}){
@@ -390,12 +511,22 @@ async function salvarCampo(el){
 }
 
 document.addEventListener('click', async e=>{
+ const mo = e.target.closest('[data-modelo]');
+ if(mo){
+  const d = itens.find(x=>x.id===+mo.dataset.id), ta = document.getElementById('rr'+mo.dataset.id);
+  if(d && ta){ ta.value = preencher(modelosDe(d)[mo.dataset.modelo], d); salvarCampo(ta); ta.focus(); }
+  return;
+ }
+ const vs = e.target.closest('[data-vista]'); if(vs){ trocarVista(vs.dataset.vista); return; }
+ const ir = e.target.closest('[data-ir]'); if(ir){ irPara(+ir.dataset.ir); return; }
+ const cl = e.target.closest('[data-calor]'); if(cl){ METRICA_CALOR = cl.dataset.calor; carregarMetricas(); return; }
  const f = e.target.closest('[data-fila]'); if(f){ filaAtual = f.dataset.fila; render(); return; }
  const fr = e.target.closest('[data-frente]'); if(fr){ frenteAtual = fr.dataset.frente; render(); return; }
  const ca = e.target.closest('[data-canal]'); if(ca){ canalAtual = ca.dataset.canal; render(); return; }
  const b = e.target.closest('[data-acao]'); if(!b) return;
  const id = +b.dataset.id, d = itens.find(x=>x.id===id), a = b.dataset.acao;
  if(a==='abrir'){
+  if(b.dataset.campo==='respostaMsg' && !(d.respostaMsg||'').trim()){ toast('Escreva a sua resposta primeiro.', false); return; }
   const texto = d[b.dataset.campo] || d.mensagem || '';
   const url = linkCanal(d, texto);
   if(!url){ toast('Este lead não tem contato válido para ' + (CANAIS[d.canal]||d.canal) + '. Use "Copiar mensagem".', false); return; }
@@ -417,7 +548,33 @@ document.addEventListener('click', async e=>{
   if(motivo===null) return;
   return executar(id, a, {motivo: motivo || padrao || 'Descartado.'});
  }
+ if(a==='verAcessos'){
+  const alvo = document.getElementById('ac'+id); if(!alvo) return;
+  if(alvo.innerHTML){ alvo.innerHTML=''; return; }
+  try{
+   const j = await api('/api/rastreio/acessos/'+id);
+   alvo.innerHTML = j.acessos.length ? '<ul>' + j.acessos.map(x=>`<li class="${x.bot?'bot':''}" title="${esc(x.user_agent)}">${hm(x.data_hora)} · ${x.bot?'robô ('+esc(x.motivo_bot)+')':'pessoa'}${x.pagina&&x.pagina.includes('apresentacao')?' · apresentação':''}</li>`).join('') + '</ul>' : '<ul><li>Nenhum acesso registrado.</li></ul>';
+  }catch(err){ alvo.textContent = 'Não deu para ler: ' + err.message; }
+  return;
+ }
+ if(a==='enviado') return executar(id, a, {agora: agoraLocal()});
  if(a==='apresentacao') return executar(id, a, {texto: d.apresentacaoMsg});
+ if(a==='clienteDisse'){
+  const t = (document.getElementById('rc'+id)||{}).value || '';
+  if(!t.trim()){ toast('Cole a resposta do cliente primeiro.', false); return; }
+  return executar(id, a, {texto: t});
+ }
+ if(a==='respostaEnviada'){
+  if(!(d.respostaMsg||'').trim()){ toast('Escreva a sua resposta primeiro.', false); return; }
+  return executar(id, a, {texto: d.respostaMsg});
+ }
+ if(a==='sugestao'){
+  const p = pedidoClaude(d);
+  (navigator.clipboard ? navigator.clipboard.writeText(p) : Promise.reject()).then(
+   ()=>toast('Pedido copiado. Cole num chat do Claude e traga a resposta para "Sua resposta".', false),
+   ()=>toast('Não deu para copiar neste navegador.', false));
+  return;
+ }
  executar(id, a);
 });
 
@@ -439,6 +596,71 @@ document.getElementById('toastUndo').addEventListener('click', async ()=>{
  }catch(e){ toast('Não deu para desfazer: ' + e.message, false); }
 });
 document.getElementById('atualizar').addEventListener('click', ()=>carregar(true));
+
+let vistaAtual = 'cards', METRICA_CALOR = 'resposta';
+function trocarVista(v){
+ vistaAtual = v;
+ document.querySelectorAll('[data-vista]').forEach(b=>{ b.classList.toggle('on', b.dataset.vista===v); b.setAttribute('aria-selected', b.dataset.vista===v); });
+ document.getElementById('vCards').hidden = v!=='cards';
+ document.getElementById('vMetricas').hidden = v!=='metricas';
+ if(v==='metricas') carregarMetricas();
+}
+function irPara(id){
+ const d = itens.find(x=>x.id===id); if(!d) return;
+ filaAtual = filaDe(d); frenteAtual='todas'; canalAtual='todos'; termo = (d.lead_nome||'').toLowerCase();
+ document.getElementById('busca').value = d.lead_nome||''; trocarVista('cards'); render();
+}
+const pct = v => v==null ? '—' : String(v).replace('.',',')+'%';
+const DIAS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const tom = a => `color-mix(in srgb, var(--accent) ${Math.round(a*100)}%, var(--paper))`;
+async function carregarMetricas(){
+ const el = document.getElementById('vMetricas');
+ let m; try{ m = await api('/api/rastreio/metricas'); }catch(e){ el.innerHTML = `<div class="vazio"><b>Não deu para calcular</b>${esc(e.message)}</div>`; return; }
+ const cs = Object.entries(m.canais).sort((a,b)=>b[1].enviados-a[1].enviados);
+ const soma = k => cs.reduce((a,[,v])=>a+(v[k]||0),0);
+ const rast = soma('rastreados'), ab = soma('abertos'), env = soma('enviados'), resp = soma('responderam');
+ const tiles = [
+  [pct(rast?Math.round(1000*ab/rast)/10:null), 'Taxa de abertura', `${ab} de ${rast} envios rastreados`],
+  [pct(env?Math.round(1000*resp/env)/10:null), 'Taxa de resposta', `${resp} de ${env} envios`],
+  [dur(m.geral_mediana_min_abertura), 'Tempo típico até abrir', 'mediana, só pessoas'],
+  [String(m.sem_abertura.length), 'Sem abertura há +72h', 'fila de follow-up abaixo']
+ ];
+ const linhas = cs.map(([k,v])=>`<tr><td>${esc(CANAIS[k]||k)}</td><td>${v.enviados}</td><td>${v.rastreados}</td><td>${v.abertos}</td><td>${pct(v.taxa_abertura)}</td><td>${v.responderam}</td><td>${pct(v.taxa_resposta)}</td><td>${dur(v.mediana_min_abertura)}</td><td>${dur(v.media_min_abertura)}</td><td>${dur(v.mediana_min_resposta)}</td><td>${dur(v.media_min_resposta)}</td></tr>`).join('');
+ let maxEnv = 0; Object.values(m.calor).forEach(c=>maxEnv=Math.max(maxEnv,c.enviados));
+ const horas = [...Array(24).keys()];
+ let grade = '<div></div>' + horas.map(h=>`<div class="h">${h}</div>`).join('');
+ DIAS.forEach((dn,di)=>{
+  grade += `<div class="dl">${dn}</div>`;
+  horas.forEach(h=>{
+   const c = m.calor[di+'-'+h];
+   if(!c){ grade += `<div class="c" data-dica="${dn} ${h}h: nenhum envio"></div>`; return; }
+   const taxa = METRICA_CALOR==='envios' ? c.enviados/maxEnv : (METRICA_CALOR==='abertura' ? c.abertos : c.responderam)/c.enviados;
+   const rot = METRICA_CALOR==='envios' ? c.enviados : Math.round(100*taxa);
+   grade += `<div class="c ${taxa>=.5?'v':''}" style="background:${tom(.15+.85*taxa)}" data-dica="${dn} ${h}h · ${c.enviados} envio${c.enviados>1?'s':''} · ${c.abertos} abert${c.abertos==1?'o':'os'} · ${c.responderam} resposta${c.responderam==1?'':'s'}">${rot}</div>`;
+  });
+ });
+ const fila = m.sem_abertura.map(f=>`<div class="item"><b>${esc(f.nome)}</b><span>${esc(CANAIS[f.canal]||f.canal)} · enviado ${hm(f.enviado_em)} · há ${Math.floor(f.horas/24)} dias${f.followupEnviadoEm?' · follow-up já feito em '+br(f.followupEnviadoEm):''}</span><button class="btn" data-ir="${f.id}">Abrir card</button></div>`).join('');
+ el.innerHTML = `
+  <div class="tiles">${tiles.map(t=>`<div class="tile"><div class="n">${t[0]}</div><div class="l">${t[1]}</div><div class="d">${t[2]}</div></div>`).join('')}</div>
+  <h2>Por canal</h2>
+  <p class="sub">Abertura conta só envios com link rastreável e “Enviei” marcado, e só acessos de pessoas (robôs de pré-visualização e acessos até 15 s depois do envio ficam de fora). Resposta conta todos os envios.${m.ultima_sync?' Última leitura da VPS: '+hm(m.ultima_sync)+'.':' A VPS ainda não foi lida.'} Acessos registrados: ${m.acessos.total} (${m.acessos.bots} de robô).</p>
+  <div class="rolar"><table class="tab"><thead><tr><th>Canal</th><th>Enviados</th><th>Rastreados</th><th>Abriram</th><th>Abertura</th><th>Responderam</th><th>Resposta</th><th>Até abrir (mediana)</th><th>Até abrir (média)</th><th>Até responder (mediana)</th><th>Até responder (média)</th></tr></thead><tbody>${linhas||'<tr><td colspan="11">Nenhum envio ainda.</td></tr>'}</tbody></table></div>
+  <h2>Hora e dia do envio</h2>
+  <p class="sub">Cada quadrado é um horário de envio (só envios rastreados, pela hora do “Enviei”). Passe o mouse para ver os números: com poucos envios num quadrado, 100% pode ser 1 de 1.</p>
+  <div class="grupo" style="margin-bottom:10px"><span>Mostrar</span>${[['resposta','% de resposta'],['abertura','% de abertura'],['envios','nº de envios']].map(([k,n])=>`<button class="chip ${METRICA_CALOR===k?'on':''}" data-calor="${k}">${n}</button>`).join('')}</div>
+  <div class="rolar"><div class="calor">${grade}</div></div>
+  <div class="leg"><span>menos</span>${[.15,.43,.72,1].map(a=>`<i style="background:${tom(a)}"></i>`).join('')}<span>mais</span><span>· vazio = nenhum envio nesse horário</span></div>
+  <h2>Fila de follow-up: sem abertura há mais de 72 h</h2>
+  <p class="sub">Enviados com link rastreável que ninguém abriu, sem resposta e não encerrados.</p>
+  <div class="fup">${fila || '<div class="vazio"><b>Ninguém nessa fila</b>Todo envio rastreado com mais de 72 h já foi aberto ou respondido.</div>'}</div>`;
+}
+const dica = document.getElementById('dica');
+document.addEventListener('mousemove', e=>{
+ const c = e.target.closest && e.target.closest('[data-dica]');
+ if(!c){ dica.style.display='none'; return; }
+ dica.textContent = c.dataset.dica; dica.style.display='block';
+ dica.style.left = Math.min(e.clientX+12, innerWidth-250)+'px'; dica.style.top = (e.clientY+14)+'px';
+});
 
 carregar(true);
 </script>

@@ -1,0 +1,15 @@
+# /etc/systemd/system/rastreio.service
+[Unit]
+Description=Rastreio de links dos disparos (Prospector)
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/rastreio
+Environment=RASTREIO_DB=/home/ubuntu/rastreio/acessos.db
+EnvironmentFile=/home/ubuntu/rastreio/segredos.env
+ExecStart=/usr/bin/python3 /home/ubuntu/rastreio/rastreio_vps.py --porta 8790
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

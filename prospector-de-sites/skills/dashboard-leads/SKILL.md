@@ -14,7 +14,7 @@ Arquitetura na RAIZ da pasta conectada:
 
 ## Setup (uma vez, no /setup ou no primeiro uso)
 
-1. Copie `references/dashboard-server.py`, `references/iniciar-dashboard.bat`, `references/disparos_modulo.py` e `references/disparos.html` desta skill para a raiz da pasta conectada, e crie a pasta `entrada/` (com `entrada/importados/`). Se o usuário já tem um `dashboard-server.py` ou `dashboard.html` personalizado, **não sobrescreva**: acrescente só as linhas do Disparos (veja "Página Disparos" abaixo).
+1. Copie `references/dashboard-server.py`, `references/iniciar-dashboard.bat`, `references/disparos_modulo.py`, `references/rastreio_modulo.py` e `references/disparos.html` desta skill para a raiz da pasta conectada, e crie a pasta `entrada/` (com `entrada/importados/`). Se o usuário já tem um `dashboard-server.py` ou `dashboard.html` personalizado, **não sobrescreva**: acrescente só as linhas do Disparos (veja "Página Disparos" abaixo).
 2. Crie o `prospector.db` com o schema abaixo (via python3/sqlite3 no bash).
 3. Gere o `dashboard.html` a partir de `references/dashboard-template.html` substituindo `__DADOS__` pelo snapshot JSON.
 4. Diga ao usuário: "duplo clique em `iniciar-dashboard.bat` abre o painel com o banco conectado" (requer Python instalado no Windows — se não tiver, o dashboard.html funciona no modo arquivo).
@@ -58,8 +58,16 @@ Cada mensagem preparada por um comando ou skill vira um registro em `disparos` (
 
 - **Gravar (pasta conectada):** `import disparos_modulo as dm` (da raiz da pasta) e use `dm.gravar_lead(c, lead)` e `dm.gravar_disparo(c, disparo, origem)`, com `origem` = `Claude Code /<comando> AAAA-MM-DD` ou o nome do chat. Lead novo entra; lead existente só ganha campos vazios e nunca muda de status; disparo repetido (mesmo slug + canal + mensagem) não duplica.
 - **Gravar (chat sem pasta):** salve `disparos-AAAA-MM-DD-<nicho>.json` (`{"origem", "leads": [...], "disparos": [...]}`) em `entrada/` pelo conector do Google Drive; o painel importa ao abrir ou no botão "Atualizar e importar entrada".
-- **Não gere mais páginas `disparos-*.html`.** O envio continua manual: o usuário envia pelo botão do canal e marca na página ("Marcar como enviada" → lead `proposta` + `dataProposta`, follow-up em 4 dias; "Respondeu"; "Recusou/Descartar"; "Reabrir"; "Desfazer").
+- **Não gere mais páginas `disparos-*.html`.** O envio continua manual: o usuário envia pelo botão do canal e marca na página ("Enviei" → lead `proposta` + `dataProposta`, follow-up em 4 dias; "Respondeu"; "Recusou/Descartar"; "Reabrir"; "Desfazer").
 - **Em painel personalizado:** no `dashboard-server.py`, `import disparos_modulo as dm` no topo e `if dm.tratar(self, 'GET'): return` (e `'POST'`, `'PUT'`) no começo de `do_GET`, `do_POST` e `do_PUT`; no `__main__`, depois de abrir a conexão, `dm.garantir_tabela(c)` e `dm.importar_entrada(c, os.path.join(PASTA, 'entrada'))`. No `dashboard.html`, um item "Disparos" na lateral que abre `/disparos.html`. O `references/dashboard-server.py` e o template já vêm assim.
+
+### Rastreio de abertura dos links (`rastreio_modulo.py`)
+
+Cada disparo com link de `/modelos/` ou `/clientes/` do site ganha um `codigo_rastreio` único (7 caracteres) e o link vira `<url>?l=<codigo>`. Isso acontece na importação, ou antes, se a skill que gerou o JSON já mandar `codigo_rastreio`. Na tabela `disparos`, `enviado_em` e `respondeu_em` guardam a hora exata ("Enviei" e "Respondeu"), e `primeira_abertura_em` e `total_aberturas` contam só pessoas. A tabela `acessos_link` guarda cada acesso, com `bot` e `motivo_bot`.
+
+- **VPS:** `references/rastreio-vps/` traz o serviço (`rastreio_vps.py` + `rastreio.service`, com token e sal em `segredos.env`) e os trechos do Nginx (`sub_filter` injeta `/r/r.js` nas páginas, e `/r/` vai para o serviço). A VPS guarda só o acesso bruto.
+- **Painel:** a chave `"rastreio": {"url": "https://<dominio>/r", "token": "..."}` vai no `prospector-config.json`. O botão "Atualizar e importar entrada" puxa os acessos novos (`/r/sync`). É no painel que se decide se o acesso é robô: user-agent de pré-visualização (WhatsApp, facebookexternalhit, bot, crawler, curl...) ou acesso até 15 s depois do envio (ou antes dele). O navegador interno do Instagram conta como pessoa.
+- **Aba Métricas** da página Disparos: taxa de abertura e de resposta por canal, tempos até abrir e até responder, mapa de calor por dia e hora do envio e a fila de quem não abriu há mais de 72 h.
 
 ## O que o painel faz sozinho (não reimplementar)
 
