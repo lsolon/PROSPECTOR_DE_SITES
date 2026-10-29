@@ -9,7 +9,7 @@ Arquitetura na RAIZ da pasta conectada:
 
 - **`prospector.db`** — banco SQLite, a FONTE DA VERDADE dos leads.
 - **`dashboard-server.py` + `iniciar-dashboard.bat`** — mini-servidor local (Python padrão, sem dependências). O usuário dá duplo clique no .bat → abre `http://localhost:8765` com o painel completo: editar, excluir e arrastar cards salvam direto no banco.
-- **`disparos_modulo.py` + `disparos.html`** — a página **Disparos** (`http://localhost:8765/disparos.html`, item "Disparos" na lateral): todas as mensagens de prospecção (sites, ingressos, decoração…) numa tabela `disparos` do banco, em filas (A enviar, Follow-up hoje, Aguardando, Responderam, Encerrados). O servidor atende as rotas `/api/disparos*` pelo módulo e, ao iniciar, importa os JSON da pasta `entrada/`.
+- **`disparos_modulo.py` + `disparos.html`** — a página **Disparos** (`http://localhost:8765/disparos.html`, item "Disparos" na lateral): todas as mensagens de prospecção (sites, ingressos, decoração…) numa tabela `disparos` do banco, em filas (A enviar, Follow-up hoje, Abriram, Aguardando, Responderam, Encerrados). O servidor atende as rotas `/api/disparos*` pelo módulo e, ao iniciar, importa os JSON da pasta `entrada/`.
 - **`dashboard.html`** — a página do painel (gerada do template). Servida pelo servidor (modo banco) ou aberta por duplo clique (modo arquivo: só leitura + edições presas ao navegador). O badge no topo indica o modo.
 
 ## Setup (uma vez, no /setup ou no primeiro uso)
@@ -67,6 +67,7 @@ Cada disparo com link de `/modelos/` ou `/clientes/` do site ganha um `codigo_ra
 
 - **VPS:** `references/rastreio-vps/` traz o serviço (`rastreio_vps.py` + `rastreio.service`, com token e sal em `segredos.env`) e os trechos do Nginx (`sub_filter` injeta `/r/r.js` nas páginas, e `/r/` vai para o serviço). A VPS guarda só o acesso bruto.
 - **Painel:** a chave `"rastreio": {"url": "https://<dominio>/r", "token": "..."}` vai no `prospector-config.json`. O botão "Atualizar e importar entrada" puxa os acessos novos (`/r/sync`). É no painel que se decide se o acesso é robô: user-agent de pré-visualização (WhatsApp, facebookexternalhit, bot, crawler, curl...) ou acesso até 15 s depois do envio (ou antes dele). O navegador interno do Instagram conta como pessoa.
+- **Página aberta:** a cada minuto a página busca as aberturas novas sozinha. Quando alguém abre, aparece um aviso, o card ganha o selo "Abriu" e vai para a fila **Abriram** (quem abriu e ainda não respondeu). Se você estiver digitando, a lista só se atualiza quando você sai do campo.
 - **Aba Métricas** da página Disparos: taxa de abertura e de resposta por canal, tempos até abrir e até responder, mapa de calor por dia e hora do envio e a fila de quem não abriu há mais de 72 h.
 
 ## O que o painel faz sozinho (não reimplementar)
